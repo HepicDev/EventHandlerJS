@@ -19,16 +19,27 @@ class EventHandler {
     }
 
     on(name, listener) {
-        if (!this.#events[name]) this.#events[name] = [];
-        this.#events[name].push(listener);
+        if (!this.#events[name]) this.#events[name] = { on: [], once: []};
+        this.#events[name].on.push(listener);
     }
 
-    off(name, listener) {
-        if (this.#events[name]) this.#events[name].remove(listener);
+    once(name, listener) {
+        if (!this.#events[name]) this.#events[name] = { on: [], once: []};
+        this.#events[name].once.push(listener);
+    }
+
+    off(name, listener, onceToo) {
+        if (this.#events[name]) {
+            this.#events[name].on.remove(listener);
+            if (onceToo) this.#events[name].once.remove(listener);
+        }
     }
 
     emit(name, ...args) {
-        this.#events[name].forEach(listener => listener(...args));
+        this.#events[name].on.forEach(listener => listener(...args));
+        this.#events[name].once.forEach(listener => listener(...args));
+        this.#events[name].once = [];
     }
 
 }
+
