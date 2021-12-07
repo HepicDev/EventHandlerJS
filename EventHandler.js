@@ -18,13 +18,17 @@ class EventHandler {
         this.#events = {};
     }
 
+    ensureEventArrays(name) {
+        if (!this.#events[name]) this.#events[name] = { on: [], once: [] };
+    }
+
     on(name, listener) {
-        if (!this.#events[name]) this.#events[name] = { on: [], once: []};
+        this.ensureEventArrays(name)
         this.#events[name].on.push(listener);
     }
 
     once(name, listener) {
-        if (!this.#events[name]) this.#events[name] = { on: [], once: []};
+        this.ensureEventArrays(name)
         this.#events[name].once.push(listener);
     }
 
