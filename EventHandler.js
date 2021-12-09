@@ -32,6 +32,7 @@ class EventHandler {
     }
 
     on(name, listener) {
+        this.emit("newListener", name, listener)
         this.ensureEventArrays(name);
         this.#events[name].on.push(listener);
         return this
@@ -39,6 +40,7 @@ class EventHandler {
 
     
     once(name, listener) {
+        this.emit("newListener", name, listener)
         this.ensureEventArrays(name);
         this.#events[name].once.push(listener);
         return this
