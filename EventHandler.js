@@ -32,17 +32,32 @@ class EventHandler {
     }
 
     on(name, listener) {
-        this.emit("newListener", name, listener);
         this.ensureEventArrays(name);
+        this.emit("newListener", name, listener);
         this.#events[name].on.push(listener);
         return this;
     }
 
     
     once(name, listener) {
-        this.emit("newListener", name, listener);
         this.ensureEventArrays(name);
+        this.emit("newListener", name, listener);
         this.#events[name].once.push(listener);
+        return this;
+    }
+
+    prependListener(name, listener) {
+        this.ensureEventArrays(name);
+        this.emit("newListener", name, listener);
+        this.#events[name].on.unshift(listener);
+        return this;
+    }
+
+    
+    prependOnceListener(name, listener) {
+        this.ensureEventArrays(name);
+        this.emit("newListener", name, listener);
+        this.#events[name].once.unshift(listener);
         return this;
     }
 
@@ -65,12 +80,14 @@ class EventHandler {
     emit(name, ...args) {
         var success = false;
         this.ensureEventArrays(name);
-        if (this.#events[name].once.length > 0) {
-            this.#events[name].once.forEach(listener => listener(...args));
-            success = true;
+
+        var len = this.#events[name].once.length;
+        if (len > 0) {
+            for(var i = 0; i < len; i++) { 
+                this.#events[name].once.shift()(...args);
+            }
         }
 
-        this.#events[name].once = [];
         if (this.#events[name].on.length > 0) {
             this.#events[name].on.forEach(listener => listener(...args));
             success = true;
@@ -90,8 +107,6 @@ class EventHandler {
         return this.#events[name];
     }
 
-    
+
 
 }
-
-
