@@ -5,108 +5,183 @@ Array.prototype.remove = function(value, onlyFirst) {
     for (var i = this.length; i--; ) {
         if (this[i] === value) {
             this.splice(i, 1);
-            success = true
-            if (onlyFirst) return success
+            success = true;
+            if (onlyFirst) return success;
         }
     }
 
-    return success
+    return success;
 }
 class EventHandler {
 
     #events;
 
     constructor() {
-        this.#events = {};
-        this.initAliases();
+        try {
+            this.#events = {};
+            this.initAliases();
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
     }
 
     initAliases() {
-        this.addListener = this.on;
-        this.removeListener = this.off;
-        this.removeAllListeners = this.offAll;
+        try {
+            this.addListener = this.on;
+            this.removeListener = this.off;
+            this.removeAllListeners = this.offAll;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     ensureEventArrays(name) {
-        if (!this.#events[name]) this.#events[name] = { on: [], once: [] };
+        try {
+            if (!this.#events[name]) this.#events[name] = { on: [], once: [] };
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     on(name, listener) {
-        this.ensureEventArrays(name);
-        this.emit("newListener", name, listener);
-        this.#events[name].on.push(listener);
-        return this;
+        try {
+            this.ensureEventArrays(name);
+            this.emit("newListener", name, listener);
+            this.#events[name].on.push(listener);
+            return this;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     
     once(name, listener) {
-        this.ensureEventArrays(name);
-        this.emit("newListener", name, listener);
-        this.#events[name].once.push(listener);
-        return this;
+        try {
+            this.ensureEventArrays(name);
+            this.emit("newListener", name, listener);
+            this.#events[name].once.push(listener);
+            return this;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     prependListener(name, listener) {
-        this.ensureEventArrays(name);
-        this.emit("newListener", name, listener);
-        this.#events[name].on.unshift(listener);
-        return this;
+        try {
+            this.ensureEventArrays(name);
+            this.emit("newListener", name, listener);
+            this.#events[name].on.unshift(listener);
+            return this;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     
     prependOnceListener(name, listener) {
-        this.ensureEventArrays(name);
-        this.emit("newListener", name, listener);
-        this.#events[name].once.unshift(listener);
-        return this;
+        try {
+            this.ensureEventArrays(name);
+            this.emit("newListener", name, listener);
+            this.#events[name].once.unshift(listener);
+            return this;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     off(name, listener) {
-        this.ensureEventArrays(name);
-        var removed = this.#events[name].once.remove(listener, true);
-        if (!removed) removed = this.#events[name].on.remove(listener, true);
-        if (removed) this.emit("removeListener", name, listener);
-        return this;
+        try {
+            this.ensureEventArrays(name);
+            var removed = this.#events[name].once.remove(listener, true);
+            if (!removed) removed = this.#events[name].on.remove(listener, true);
+            if (removed) this.emit("removeListener", name, listener);
+            return this;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     
     offAll(name) {
-        this.#events[name].on = [];
-        this.#events[name].once = [];
-        return this;
+        try {
+            this.#events[name].on = [];
+            this.#events[name].once = [];
+            return this;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
 
     emit(name, ...args) {
-        var success = false;
-        this.ensureEventArrays(name);
-
-        var len = this.#events[name].once.length;
-        if (len > 0) {
-            for(var i = 0; i < len; i++) { 
-                this.#events[name].once.shift()(...args);
+        try {
+            var success = false;
+            this.ensureEventArrays(name);
+    
+            var len = this.#events[name].once.length;
+            if (len > 0) {
+                for(var i = 0; i < len; i++) { 
+                    this.#events[name].once.shift()(...args);
+                }
             }
+    
+            if (this.#events[name].on.length > 0) {
+                this.#events[name].on.forEach(listener => listener(...args));
+                success = true;
+            }
+            return success;
         }
-
-        if (this.#events[name].on.length > 0) {
-            this.#events[name].on.forEach(listener => listener(...args));
-            success = true;
+        catch(err) {
+            this.emit("error", err);
         }
-        return success;
+        
     }
 
     eventNames() {
-        return Object.keys(this.#events);
+        try {
+            return Object.keys(this.#events);
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     listenerCount() {
-        return this.eventNames().length;
+        try {
+            return this.eventNames().length;
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
 
     listeners(name) {
-        return this.#events[name];
+        try {
+            return this.#events[name];
+        }
+        catch(err) {
+            this.emit("error", err);
+        }
+        
     }
-
-
 
 }
