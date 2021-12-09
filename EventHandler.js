@@ -47,10 +47,10 @@ class EventHandler {
     }
 
     off(name, listener) {
-        if (this.#events[name]) {
-            var removed = this.#events[name].once.remove(listener, true);
-            if (!removed) this.#events[name].on.remove(listener, true);
-        }
+        this.ensureEventArrays(name)
+        var removed = this.#events[name].once.remove(listener, true);
+        if (!removed) removed = this.#events[name].on.remove(listener, true);
+        if (removed) this.emit("removeListener", name, listener)
         return this
     }
 
